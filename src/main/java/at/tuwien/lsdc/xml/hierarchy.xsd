@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.infosys.tuwien.ac.at/lsds/hierarchy/" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.infosys.tuwien.ac.at/lsds/hierarchy/">
+
+
+    <element name="hierarchy" type="tns:hierarchyType"></element>
+    
+    <complexType name="hierarchyType">
+    	<sequence minOccurs="0" maxOccurs="unbounded">
+    		<element name="topic" type="tns:topicType"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="topicType">
+    	<sequence>
+    		<element name="topic" type="tns:topicType" minOccurs="0" maxOccurs="unbounded"></element>
+    	</sequence>
+    	<attribute name="name" type="string" use="required"></attribute>
+    </complexType>
+</schema>
