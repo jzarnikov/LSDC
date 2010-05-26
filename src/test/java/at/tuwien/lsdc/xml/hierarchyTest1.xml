@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:hierarchy xmlns:tns="http://www.infosys.tuwien.ac.at/lsds/hierarchy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="../../../../../../main/java/at/tuwien/lsdc/xml/hierarchy.xsd">
+<tns:topic name="rootTopic">
+	<tns:topic name="network">
+		<tns:topic name="in-trafic"/>
+		<tns:topic name="out-trafic"/>
+		<tns:topic name="latency"/>
+	</tns:topic>
+	<tns:topic name="performance">
+		<tns:topic name="cpu">
+			<tns:topic name="load"/>
+			<tns:topic name="free-cores"/>
+		</tns:topic>
+	</tns:topic>
+</tns:topic>
+</tns:hierarchy>
