@@ -1,5 +1,8 @@
 package at.tuwien.lsdc;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -20,6 +23,8 @@ import at.tuwien.lsdc.interfaces.Hierarchy;
 
 public class DMMessagesImplTest {
 
+	private static boolean running = true;
+	
     @Test
     public void listenForEveryToMessages() {
         Hierarchy hierarchy = Mockito.mock(Hierarchy.class);
@@ -30,9 +35,12 @@ public class DMMessagesImplTest {
     }
 
     public static void main(String[] args) throws Exception {
-        thread(new HelloWorldConsumer(), false);
+    	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    	thread(new HelloWorldConsumer(), false);
         thread(new HelloWorldConsumer(), false);
         thread(new HelloWorldProducer(), false);
+        in.readLine();
+        running = false;
     }
 
     public static void thread(Runnable runnable, boolean daemon) {
@@ -43,7 +51,8 @@ public class DMMessagesImplTest {
 
     public static class HelloWorldProducer implements Runnable {
         public void run() {
-            try {
+            System.out.println("Producer started");
+        	try {
                 // Create a ConnectionFactory
                 ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
 
@@ -70,11 +79,15 @@ public class DMMessagesImplTest {
                 System.out.println("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
                 for (int i = 0; i < 10; i++) {
                     producer.send(message);
+                    Thread.sleep(1000);
                 }
 
                 // Clean up
+                producer.close();
                 session.close();
                 connection.close();
+                System.out.println("Producer closed");
+                System.out.println("<Hit enter to stop>");
             } catch (Exception e) {
                 System.out.println("Caught: " + e);
                 e.printStackTrace();
@@ -87,7 +100,8 @@ public class DMMessagesImplTest {
         private int i = 0;
 
         public void run() {
-            try {
+            System.out.println("Consumer started");
+        	try {
 
                 // Create a ConnectionFactory
                 ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
@@ -108,12 +122,16 @@ public class DMMessagesImplTest {
                 MessageConsumer consumer = session.createConsumer(destination);
                 consumer.setMessageListener(this);
                 connection.start();
-                while (true)
+                while (running)
                     ;
+                System.out.println("Consumer closed");
+                consumer.close();
+                session.close();
+                connection.close();
             } catch (Exception e) {
                 System.out.println("Caught: " + e);
                 e.printStackTrace();
-            }
+            } 
         }
 
         public synchronized void onException(JMSException ex) {
