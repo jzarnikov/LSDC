@@ -13,6 +13,7 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 public class ConsumerTest implements MessageListener {
@@ -38,7 +39,7 @@ public class ConsumerTest implements MessageListener {
 	public void init() {
 		try {
 			// Create a ConnectionFactory
-	        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+	        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
 	
 	        // Create a Connection
 	        connection = connectionFactory.createConnection();

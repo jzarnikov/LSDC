@@ -8,6 +8,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.store.amq.AMQPersistenceAdapterFactory;
 
@@ -21,7 +22,7 @@ public class ProducerTest {
 	private void init() {
 		System.out.println("Producer started");
 		// Create a ConnectionFactory
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
                 
         try {
 	        // Create a Connection
