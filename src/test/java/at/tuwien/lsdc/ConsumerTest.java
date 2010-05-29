@@ -12,9 +12,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.Topic;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
@@ -24,6 +21,7 @@ public class ConsumerTest implements MessageListener {
 	private Connection connection;
 	private Session session;
 	private MessageConsumer consumer;
+	
 	private int i = 0;
 	
 	/**
@@ -40,22 +38,21 @@ public class ConsumerTest implements MessageListener {
 	public void init() {
 		try {
 			// Create a ConnectionFactory
-	        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost?useJmx=false");
+	        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
 	
 	        // Create a Connection
 	        connection = connectionFactory.createConnection();
 	
 	        // Create a Session
-	        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-	
-	        InitialContext ctx = new InitialContext();
-	        Topic destination = (Topic)ctx.lookup("TEST.FOO");
+	        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);	
+	       
 	        	        
 	        // Create the destination (Topic or Queue)
-	        //Destination destination = session.createTopic("TEST.FOO");
+	        Destination destination = session.createTopic("TEST.FOO");
 	
 	        // Create a MessageConsumer from the Session to the Topic or
 	        // Queue
+	       
 	        consumer = session.createConsumer(destination);
 	        consumer.setMessageListener(this);
 	        connection.start();
@@ -63,9 +60,7 @@ public class ConsumerTest implements MessageListener {
 			// Should not happen
 			System.out.println("Initialization failed");
 			e.printStackTrace();
-	    } catch (NamingException e) {
-	    	e.printStackTrace();
-	    }	    
+	    } 	    
 	}
 	
 	public void consume() {
