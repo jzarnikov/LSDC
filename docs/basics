@@ -1,0 +1,50 @@
+Layered SLA-Violation Propagation Framework - LSVPF
+
+LSVPF consists of several components:
+
+1) Hierarchy:
+The hierarchy defines the different layers of the SLA. It is modeled as a tree with the root as the most general requirement (the system is suitable for execution of the task) and the leafs as fine grained requiremens (e.g. the network latency is less then X ms.). The nodes/leafs of the tree are called topics.
+Each topic in the tree is identified by a unique name and each topic has exactly one parent element (except the root node of course).
+Internally the hierarchy is represented by the at.tuwien.lsdc.interfaces.Hierarchy interface which has two methods:
+
+String[] allTopics() which returns names of all available topics
+String getParentOf(String topic) which returns the name of the parent topic
+
+Currently there is one implementation of this interface: at.tuwien.lsdc.xml.XMLHierarchy which reads the tree structure from an XML file. An XML topic hierarchy may look like following example:
+
+<tns:hierarchy xmlns:tns="http://www.infosys.tuwien.ac.at/lsds/hierarchy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="docs/xsd/hierarchy.xsd">
+<tns:topic name="rootTopic">
+	<tns:topic name="network">
+		<tns:topic name="in-trafic"/>
+		<tns:topic name="out-trafic"/>
+		<tns:topic name="latency"/>
+	</tns:topic>
+	<tns:topic name="performance">
+		<tns:topic name="cpu">
+			<tns:topic name="load"/>
+			<tns:topic name="free-cores"/>
+		</tns:topic>
+	</tns:topic>
+</tns:topic>
+</tns:hierarchy>
+
+The exact format of the XML hierarchy is defined in an XSD schema which can be found in xsd/hierarchy.xsd
+
+2) Monitor clients:
+Monitors are responsible for monitoring the current state of the infrastructure. In case of an SLA violation (or an impending SLA violation - warning) the monitor publishes a message to a specific topic.
+For example if the network latency exeeds 100ms the network monitor would publish a message with the current value and the critical thresshold to the "latency" topic (of the example hierarchy above).
+The system can have several monitors, the only requirement is that they publish to an existing topic as specified by the hierarchy
+
+3) Messaging system:
+The monitors publish their messages to the topics using ActiveMQ. The unique topic name is used as queue name. We chose ActiveMQ for several reasons:
+* It is widely used by the industry
+* It is highly portable and can be accessed from all major programming platforms.
+* It is open source
+* It is scalable 
+
+4) Decision makers:
+TODO: document this.
+
+
+
+ 
