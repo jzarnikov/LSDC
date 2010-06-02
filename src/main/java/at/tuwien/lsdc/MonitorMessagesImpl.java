@@ -19,6 +19,18 @@ public class MonitorMessagesImpl implements MonitorMessages {
 
     @Override
     public void sendMessage(String topic, Serializable messageObject) {
+        MessageImpl objectMessage = new MessageImpl(messageObject);
+        objectMessage.addToHistory(topic);
+        this.send(topic, objectMessage);
+    }
+
+    @Override
+    public void resendMessage(String topic, at.tuwien.lsdc.interfaces.MonitorMessage message) {
+        message.addToHistory(topic);
+        this.send(topic, message);
+    }
+
+    private void send(String topic, Serializable object) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
             ActiveMQConnection.DEFAULT_BROKER_URL);
 
@@ -37,7 +49,8 @@ public class MonitorMessagesImpl implements MonitorMessages {
             // Queue
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            Message message = session.createObjectMessage(messageObject);
+
+            Message message = session.createObjectMessage(object);
             producer.send(message);
 
             // Clean Up
