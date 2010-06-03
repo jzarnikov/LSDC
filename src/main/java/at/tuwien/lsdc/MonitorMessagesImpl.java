@@ -1,6 +1,8 @@
 package at.tuwien.lsdc;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
@@ -16,6 +18,30 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import at.tuwien.lsdc.interfaces.MonitorMessages;
 
 public class MonitorMessagesImpl implements MonitorMessages {
+	
+	private ActiveMQConnectionFactory connectionFactory;
+	
+	private Connection connection;
+	
+	private Session session;
+	
+	
+	private Map<String, MessageProducer> producerCache;
+	
+	
+	public MonitorMessagesImpl() {
+		try {
+			connectionFactory = new ActiveMQConnectionFactory(
+			        ActiveMQConnection.DEFAULT_BROKER_URL);
+			connection = connectionFactory.createConnection();
+			connection.start();
+			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+			producerCache = new HashMap<String, MessageProducer>();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
     @Override
     public void sendMessage(String topic, Serializable messageObject) {
@@ -31,38 +57,39 @@ public class MonitorMessagesImpl implements MonitorMessages {
     }
 
     private void send(String topic, Serializable object) {
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
-            ActiveMQConnection.DEFAULT_BROKER_URL);
-
+        
         try {
-            // Create a Connection
-            final Connection connection = connectionFactory.createConnection();
-            connection.start();
-
-            // Create a Session
-            final Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-            // Create the destination (Topic or Queue)
-            Destination destination = session.createTopic(topic);
-
-            // Create a MessageProducer from the Session to the Topic or
-            // Queue
-            MessageProducer producer = session.createProducer(destination);
-            producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            MessageProducer producer;
+            if(producerCache.containsKey(topic)) {
+            	producer = producerCache.get(topic);
+            } else {
+            	Destination destination = session.createTopic(topic);
+            	producer = session.createProducer(destination);
+            	producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+            	producerCache.put(topic, producer);
+            }
 
             Message message = session.createObjectMessage(object);
             producer.send(message);
-
-            // Clean Up
-            producer.close();
-            session.close();
-            connection.close();
 
         } catch (JMSException e) {
             // Should not happen
             System.out.println("Initialization failed");
             e.printStackTrace();
         }
+    }
+    
+    public void close() {
+    	try {
+    		for(MessageProducer producer : producerCache.values()) {
+				producer.close();
+			}
+			session.close();
+			connection.close();
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 }
