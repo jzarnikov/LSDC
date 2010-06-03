@@ -24,7 +24,7 @@ public class MessageImpl implements MonitorMessage {
     }
 
     @Override
-    public Serializable getMessgeObject() {
+    public Serializable getMessageObject() {
         return this.messageObject;
     }
 

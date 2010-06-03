@@ -3,6 +3,8 @@ package at.tuwien.lsdc;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
 import at.tuwien.lsdc.interfaces.DMCallback;
@@ -41,9 +43,19 @@ public class DMMessagesImplTest {
         monitorMessage.sendMessage(topic1, "Test");
 
         Thread.sleep(1000);
-        //Mockito.verify(callback, Mockito.times(2)).messageReceived("TOPIC1", "Test");
-        //Mockito.verify(callback).messageReceived("TOPIC2", "Test");
+        Mockito.verify(callback, Mockito.times(2)).messageReceived(Mockito.eq("TOPIC1"), Mockito.argThat(new IsMonitorMessageMatcher()));
+        Mockito.verify(callback).messageReceived(Mockito.eq("TOPIC2"), Mockito.argThat(new IsMonitorMessageMatcher()));
 
         impl.shutdown();
+    }
+    
+    class IsMonitorMessageMatcher extends ArgumentMatcher<MonitorMessage> {
+
+		@Override
+		public boolean matches(Object o) {
+			
+			return MonitorMessage.class.isAssignableFrom(o.getClass());
+		}
+    	
     }
 }

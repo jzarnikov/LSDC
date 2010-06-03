@@ -7,7 +7,7 @@ public interface MonitorMessage extends Serializable {
 
     List<String> getHistory();
 
-    Serializable getMessgeObject();
+    Serializable getMessageObject();
 
     void addToHistory(String topic);
 }

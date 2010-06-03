@@ -28,7 +28,7 @@ public class DecisionMakerClient {
                         builder.append(" " + string);
                     }
                     builder.append("\n");
-                    builder.append("Object: " + message.getMessgeObject() + "\n");
+                    builder.append("Object: " + message.getMessageObject() + "\n");
 
                     builder.append("can Handle: " + canHandle + "\n");
                     builder.append("-------------------------------------\n");
