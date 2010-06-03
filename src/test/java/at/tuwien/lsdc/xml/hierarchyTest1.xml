@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tns:hierarchy xmlns:tns="http://www.infosys.tuwien.ac.at/lsds/hierarchy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="../../../../../../main/java/at/tuwien/lsdc/xml/hierarchy.xsd">
+<tns:hierarchy xmlns:tns="http://www.infosys.tuwien.ac.at/lsds/hierarchy/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="../../../../../../../docs/xsd/hierarchy.xsd">
 <tns:topic name="rootTopic">
 	<tns:topic name="network">
 		<tns:topic name="in-trafic"/>
