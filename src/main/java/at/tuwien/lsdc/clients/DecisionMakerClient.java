@@ -8,6 +8,7 @@ import javax.xml.bind.JAXBException;
 import at.tuwien.lsdc.DMMessagesImpl;
 import at.tuwien.lsdc.interfaces.DMCallback;
 import at.tuwien.lsdc.interfaces.Hierarchy;
+import at.tuwien.lsdc.interfaces.MonitorMessage;
 import at.tuwien.lsdc.xml.XMLHierarchyFactory;
 
 public class DecisionMakerClient {
@@ -17,11 +18,24 @@ public class DecisionMakerClient {
         DMCallback callback = new DMCallback() {
 
             @Override
-            public boolean messageReceived(String topic, Object message) {
-                System.out.println(topic + ": " + message);
-                boolean nextBoolean = new Random().nextBoolean();
-                System.out.println("NextBoolean: " + nextBoolean);
-                return nextBoolean;
+            public boolean messageReceived(String topic, MonitorMessage message) {
+                boolean canHandle = new Random().nextBoolean();
+                if (canHandle) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("-------------------------------------\n");
+                    builder.append("History: ");
+                    for (String string : message.getHistory()) {
+                        builder.append(" " + string);
+                    }
+                    builder.append("\n");
+                    builder.append("Object: " + message.getMessgeObject() + "\n");
+
+                    builder.append("can Handle: " + canHandle + "\n");
+                    builder.append("-------------------------------------\n");
+                    System.out.print(builder.toString());
+                    System.out.flush();
+                }
+                return canHandle;
             }
         };
 

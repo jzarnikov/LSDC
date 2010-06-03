@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 
 import at.tuwien.lsdc.interfaces.DMCallback;
 import at.tuwien.lsdc.interfaces.Hierarchy;
+import at.tuwien.lsdc.interfaces.MonitorMessage;
 
 public class DMMessagesImplTest {
 
@@ -20,7 +21,7 @@ public class DMMessagesImplTest {
         DMCallback printCallback = new DMCallback() {
 
             @Override
-            public boolean messageReceived(String topic, Object message) {
+            public boolean messageReceived(String topic, MonitorMessage message) {
                 System.out.println(topic + " " + message);
                 return true;
             }

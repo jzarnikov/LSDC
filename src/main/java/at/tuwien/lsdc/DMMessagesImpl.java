@@ -16,7 +16,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
-import javax.management.monitor.MonitorSettingException;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -24,6 +23,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import at.tuwien.lsdc.interfaces.DMCallback;
 import at.tuwien.lsdc.interfaces.DMMessages;
 import at.tuwien.lsdc.interfaces.Hierarchy;
+import at.tuwien.lsdc.interfaces.MonitorMessage;
 import at.tuwien.lsdc.interfaces.MonitorMessages;
 
 public class DMMessagesImpl implements DMMessages, ExceptionListener {
@@ -120,10 +120,13 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
                 for (DMCallback callback : this.callbacks) {
                     try {
                         Serializable object = objectMessage.getObject();
-                        if (!callback.messageReceived(topic, object)) {
-                            String parentOf = hierarchy.getParentOf(this.topic);
-                            if (parentOf != null) {
-                                this.sender.sendMessage(parentOf, object);
+                        if (object instanceof at.tuwien.lsdc.interfaces.MonitorMessage) {
+                            MonitorMessage monitorMessage = (MonitorMessage) object;
+                            if (!callback.messageReceived(topic, monitorMessage)) {
+                                String parentOf = hierarchy.getParentOf(this.topic);
+                                if (parentOf != null) {
+                                    this.sender.resendMessage(parentOf, monitorMessage);
+                                }
                             }
                         }
                     } catch (JMSException e) {
