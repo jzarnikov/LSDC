@@ -41,6 +41,7 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
 
     public DMMessagesImpl(Hierarchy hierarchy) {
         String[] allTopics = hierarchy.allTopics();
+        producerCache = new HashMap<String, MessageProducer>();
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(
