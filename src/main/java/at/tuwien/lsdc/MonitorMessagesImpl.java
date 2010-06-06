@@ -50,12 +50,6 @@ public class MonitorMessagesImpl implements MonitorMessages {
         this.send(topic, objectMessage);
     }
 
-    @Override
-    public void resendMessage(String topic, at.tuwien.lsdc.interfaces.MonitorMessage message) {
-        message.addToHistory(topic);
-        this.send(topic, message);
-    }
-
     private void send(String topic, Serializable object) {
         
         try {
