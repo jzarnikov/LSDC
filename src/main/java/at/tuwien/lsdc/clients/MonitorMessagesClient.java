@@ -3,12 +3,12 @@ package at.tuwien.lsdc.clients;
 import java.util.Scanner;
 
 import at.tuwien.lsdc.MonitorMessagesImpl;
-import at.tuwien.lsdc.interfaces.MonitorMessages;
+import at.tuwien.lsdc.interfaces.MonitorSender;
 
 public class MonitorMessagesClient {
 
     public static void main(String[] args) {
-        MonitorMessages sender = new MonitorMessagesImpl();
+        MonitorSender sender = new MonitorMessagesImpl();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Topic to send to (quit to exit):");

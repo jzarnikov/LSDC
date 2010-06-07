@@ -3,7 +3,7 @@ package at.tuwien.lsdc.performance;
 import java.io.IOException;
 
 import at.tuwien.lsdc.MonitorMessagesImpl;
-import at.tuwien.lsdc.interfaces.MonitorMessages;
+import at.tuwien.lsdc.interfaces.MonitorSender;
 
 public class MassProducer {
 	
@@ -38,7 +38,7 @@ public class MassProducer {
 	
 	private static class ProducerWorker implements Runnable {
 		
-		private MonitorMessages sender = new MonitorMessagesImpl();
+		private MonitorSender sender = new MonitorMessagesImpl();
 		
 		private String topic;
 		
@@ -49,7 +49,7 @@ public class MassProducer {
 		@Override
 		public void run() {
 			while(running) {
-				MonitorMessages sender = new MonitorMessagesImpl();
+				MonitorSender sender = new MonitorMessagesImpl();
 				sender.sendMessage(topic, new DummyMessage());
 				try {
 					Thread.sleep(SLEEP);

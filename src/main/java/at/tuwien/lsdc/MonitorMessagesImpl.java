@@ -15,33 +15,32 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-import at.tuwien.lsdc.interfaces.MonitorMessages;
+import at.tuwien.lsdc.interfaces.DecisionMakerSender;
+import at.tuwien.lsdc.interfaces.MonitorMessage;
+import at.tuwien.lsdc.interfaces.MonitorSender;
 
-public class MonitorMessagesImpl implements MonitorMessages {
-	
-	private ActiveMQConnectionFactory connectionFactory;
-	
-	private Connection connection;
-	
-	private Session session;
-	
-	
-	private Map<String, MessageProducer> producerCache;
-	
-	
-	public MonitorMessagesImpl() {
-		try {
-			connectionFactory = new ActiveMQConnectionFactory(
-			        ActiveMQConnection.DEFAULT_BROKER_URL);
-			connection = connectionFactory.createConnection();
-			connection.start();
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			producerCache = new HashMap<String, MessageProducer>();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+public class MonitorMessagesImpl implements MonitorSender, DecisionMakerSender {
+
+    private ActiveMQConnectionFactory connectionFactory;
+
+    private Connection connection;
+
+    private Session session;
+
+    private Map<String, MessageProducer> producerCache;
+
+    public MonitorMessagesImpl() {
+        try {
+            connectionFactory = new ActiveMQConnectionFactory(ActiveMQConnection.DEFAULT_BROKER_URL);
+            connection = connectionFactory.createConnection();
+            connection.start();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            producerCache = new HashMap<String, MessageProducer>();
+        } catch (JMSException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void sendMessage(String topic, Serializable messageObject) {
@@ -50,17 +49,23 @@ public class MonitorMessagesImpl implements MonitorMessages {
         this.send(topic, objectMessage);
     }
 
+    @Override
+    public void resendMessage(String topic, MonitorMessage message) {
+        message.addToHistory(topic);
+        this.send(topic, message);
+    }
+
     private void send(String topic, Serializable object) {
-        
+
         try {
             MessageProducer producer;
-            if(producerCache.containsKey(topic)) {
-            	producer = producerCache.get(topic);
+            if (producerCache.containsKey(topic)) {
+                producer = producerCache.get(topic);
             } else {
-            	Destination destination = session.createTopic(topic);
-            	producer = session.createProducer(destination);
-            	producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-            	producerCache.put(topic, producer);
+                Destination destination = session.createTopic(topic);
+                producer = session.createProducer(destination);
+                producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+                producerCache.put(topic, producer);
             }
 
             Message message = session.createObjectMessage(object);
@@ -72,18 +77,18 @@ public class MonitorMessagesImpl implements MonitorMessages {
             e.printStackTrace();
         }
     }
-    
+
     public void close() {
-    	try {
-    		for(MessageProducer producer : producerCache.values()) {
-				producer.close();
-			}
-			session.close();
-			connection.close();
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            for (MessageProducer producer : producerCache.values()) {
+                producer.close();
+            }
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

@@ -2,7 +2,7 @@ package at.tuwien.lsdc.interfaces;
 
 import java.io.Serializable;
 
-public interface MonitorMessages {
+public interface MonitorSender {
 
     void sendMessage(String topic, Serializable message);
 
