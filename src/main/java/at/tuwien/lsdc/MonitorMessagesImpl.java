@@ -44,19 +44,19 @@ public class MonitorMessagesImpl implements MonitorSender, DecisionMakerSender {
 
     @Override
     public void sendMessage(String topic, Serializable messageObject) {
+        // If Message is sent first time it has to be wrapped
         MessageImpl objectMessage = new MessageImpl(messageObject);
-        objectMessage.addToHistory(topic);
         this.send(topic, objectMessage);
     }
 
     @Override
     public void resendMessage(String topic, MonitorMessage message) {
-        message.addToHistory(topic);
+//        A message
         this.send(topic, message);
     }
 
-    private void send(String topic, Serializable object) {
-
+    private void send(String topic, MonitorMessage object) {
+        object.addToHistory(topic);
         try {
             MessageProducer producer;
             if (producerCache.containsKey(topic)) {
@@ -86,7 +86,6 @@ public class MonitorMessagesImpl implements MonitorSender, DecisionMakerSender {
             session.close();
             connection.close();
         } catch (JMSException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

@@ -28,12 +28,19 @@ import at.tuwien.lsdc.interfaces.MonitorMessage;
 
 public class DMMessagesImpl implements DMMessages, ExceptionListener {
 
+    /**
+     * Mapping from a Topic to a Listener.
+     */
     private Map<String, Listener> listeners = Collections.synchronizedMap(new HashMap<String, Listener>());
 
     private List<MessageConsumer> consumers = new ArrayList<MessageConsumer>();
 
+    /**
+     * To resend a specific MonitorMessage
+     */
     private DecisionMakerSender sender = new MonitorMessagesImpl();
 
+    // Stored to being able to close later on
     private Connection connection;
     private Session session;
 
@@ -56,9 +63,11 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
 
                 // Create a MessageConsumer from the Session to the Topic or
                 // Queue
-
                 MessageConsumer consumer = session.createConsumer(destination);
+                // For each topic a listener is created.
                 Listener listener = new Listener(topic, this.sender, hierarchy);
+                // The message Listener has to be set for every MessageConsumer.
+                // Has to implement the MessageListener interface
                 consumer.setMessageListener(listener);
                 this.listeners.put(topic, listener);
                 System.out.println("Added Listener for Topic: " + topic);
@@ -72,6 +81,8 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
     }
 
     public void register(String topic, DMCallback callback) {
+        // If a Listener for a specific topic exists the DMCallback is
+        // added to its list of callbacks.
         if (this.listeners.containsKey(topic)) {
             this.listeners.get(topic).addCallback(callback);
         }
@@ -117,25 +128,37 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
         public void onMessage(Message message) {
             if (message instanceof ObjectMessage) {
                 ObjectMessage objectMessage = (ObjectMessage) message;
-                for (DMCallback callback : this.callbacks) {
-                    try {
-                        Serializable object = objectMessage.getObject();
-                        if (object instanceof at.tuwien.lsdc.interfaces.MonitorMessage) {
-                            System.out.println(((MonitorMessage) object).toString());
-                            MonitorMessage monitorMessage = (MonitorMessage) object;
-                            if (!callback.messageReceived(topic, monitorMessage)) {
-                                String parentOf = hierarchy.getParentOf(this.topic);
-                                if (parentOf != null) {
-                                    this.sender.resendMessage(parentOf, monitorMessage);
-                                }
-                            }
-                        }
-                    } catch (JMSException e) {
-                        System.out.println("Can't call callback");
-                        e.printStackTrace();
+                callCallbacks(objectMessage);
+            }
+        }
+
+        private void callCallbacks(ObjectMessage objectMessage) {
+            for (DMCallback callback : this.callbacks) {
+                try {
+                    Serializable object = objectMessage.getObject();
+                    if (object instanceof at.tuwien.lsdc.interfaces.MonitorMessage) {
+                        // Only MonitorMessages should be used
+                        checkCallback(callback, object);
                     }
+                } catch (JMSException e) {
+                    System.out.println("Can't call callback");
+                    e.printStackTrace();
                 }
             }
+        }
+
+        private void checkCallback(DMCallback callback, Serializable object) {
+            System.out.println(((MonitorMessage) object).toString());
+            MonitorMessage monitorMessage = (MonitorMessage) object;
+            if (!callback.messageReceived(topic, monitorMessage)) {
+                // If the callback declines the Message it has to be resent to
+                // the parent of the current topic
+                String parentOf = hierarchy.getParentOf(this.topic);
+                if (parentOf != null) {
+                    this.sender.resendMessage(parentOf, monitorMessage);
+                }
+            }
+
         }
 
         public void addCallback(DMCallback callback) {
