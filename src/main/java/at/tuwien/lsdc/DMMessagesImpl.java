@@ -148,7 +148,6 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
         }
 
         private void checkCallback(DMCallback callback, Serializable object) {
-            System.out.println(((MonitorMessage) object).toString());
             MonitorMessage monitorMessage = (MonitorMessage) object;
             if (!callback.messageReceived(topic, monitorMessage)) {
                 // If the callback declines the Message it has to be resent to
