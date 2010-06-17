@@ -24,7 +24,7 @@ public class DecisionMakerClient {
                     StringBuilder builder = new StringBuilder();
                     builder.append("-------------------------------------\n");
                     builder.append("History: ");
-                    for (String string : message.getHistory()) {
+                    for (String string : message.getHistory().values()) {
                         builder.append(" " + string);
                     }
                     builder.append("\n");

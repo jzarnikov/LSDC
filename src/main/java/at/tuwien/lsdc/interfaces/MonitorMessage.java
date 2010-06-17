@@ -1,7 +1,7 @@
 package at.tuwien.lsdc.interfaces;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Value object to transmit a Message from the Monitor
@@ -10,10 +10,12 @@ import java.util.List;
  */
 public interface MonitorMessage extends Serializable {
 
+    
     /**
-     * @return history of the topics the message was sent to
+     * The history of the message that shows how it was propagated through the system.
+     * @return A map where the keys are timestamps (unix time - ms since 1980) and values are the topics for which the message was processed at that moment.
      */
-    List<String> getHistory();
+    Map<Long, String> getHistory();
 
     Serializable getMessageObject();
 

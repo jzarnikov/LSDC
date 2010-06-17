@@ -2,8 +2,10 @@ package at.tuwien.lsdc.performance;
 
 import java.io.File;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 import at.tuwien.lsdc.DMMessagesImpl;
+import at.tuwien.lsdc.MessageImpl;
 import at.tuwien.lsdc.interfaces.DMCallback;
 import at.tuwien.lsdc.interfaces.Hierarchy;
 import at.tuwien.lsdc.interfaces.MonitorMessage;
@@ -13,7 +15,7 @@ public class DummyDecisionMaker {
 	
 	private static final float HANDLE_PROBABILITY = 0.9f;
 	
-	private static final int SLEEP = 10;
+	private static final AtomicLong counter = new AtomicLong();
 	
 	public static void main(String[] args) throws Exception {
 		Hierarchy hierarchy = XMLHierarchyFactory.load(new File("src/test/java/at/tuwien/lsdc/performance/performanceTestHierarchy.xml"));
@@ -23,11 +25,12 @@ public class DummyDecisionMaker {
             @Override
             public boolean messageReceived(String topic, MonitorMessage message) {
             	boolean handle = new Random().nextFloat() > HANDLE_PROBABILITY;
-//                try {
-//					Thread.sleep(SLEEP);
-//				} catch (InterruptedException e) {
-//					// do nothing.
-//				}
+            	if(handle) {
+            		long counterValue = counter.incrementAndGet();
+            		if(counterValue % 128 == 0) {
+            			((MessageImpl) message).printTimingDebug();
+            		}
+            	}
                 return handle;
             }
         };
