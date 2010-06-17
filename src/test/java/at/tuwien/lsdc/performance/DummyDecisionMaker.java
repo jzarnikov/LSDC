@@ -27,7 +27,7 @@ public class DummyDecisionMaker {
             	boolean handle = new Random().nextFloat() > HANDLE_PROBABILITY;
             	if(handle) {
             		long counterValue = counter.incrementAndGet();
-            		if(counterValue % 128 == 0) {
+            		if(counterValue % 512 == 0) {
             			((MessageImpl) message).printTimingDebug();
             		}
             	}

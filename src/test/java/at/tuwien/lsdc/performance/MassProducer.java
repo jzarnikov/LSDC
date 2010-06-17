@@ -65,10 +65,10 @@ public class MassProducer {
 		public void run() {
 			while(running) {
 				sender.sendMessage(topic, new DummyMessage());
-				long counter = msgCounter.incrementAndGet();
-				if(counter % 100 == 0) {
-					System.out.println("Messages sent: " + counter);
-				}
+//				long counter = msgCounter.incrementAndGet();
+//				if(counter % 100 == 0) {
+//					System.out.println("Messages sent: " + counter);
+//				}
 				try {
 					Thread.sleep(sleep);
 				} catch (InterruptedException e) {
