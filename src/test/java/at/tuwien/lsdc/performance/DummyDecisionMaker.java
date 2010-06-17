@@ -23,11 +23,11 @@ public class DummyDecisionMaker {
             @Override
             public boolean messageReceived(String topic, MonitorMessage message) {
             	boolean handle = new Random().nextFloat() > HANDLE_PROBABILITY;
-                try {
-					Thread.sleep(SLEEP);
-				} catch (InterruptedException e) {
-					// do nothing.
-				}
+//                try {
+//					Thread.sleep(SLEEP);
+//				} catch (InterruptedException e) {
+//					// do nothing.
+//				}
                 return handle;
             }
         };
