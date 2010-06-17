@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
@@ -39,7 +41,7 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
      * To resend a specific MonitorMessage
      */
     private DecisionMakerSender sender = new MonitorMessagesImpl();
-
+    
     // Stored to being able to close later on
     private Connection connection;
     private Session session;
@@ -56,6 +58,7 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
 
             // Create a Session
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            ExecutorService executorService = Executors.newCachedThreadPool();
 
             for (String topic : allTopics) {
                 // Create the destination (Topic or Queue)
@@ -65,7 +68,7 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
                 // Queue
                 MessageConsumer consumer = session.createConsumer(destination);
                 // For each topic a listener is created.
-                Listener listener = new Listener(topic, this.sender, hierarchy);
+                Listener listener = new Listener(topic, this.sender, hierarchy, executorService);
                 // The message Listener has to be set for every MessageConsumer.
                 // Has to implement the MessageListener interface
                 consumer.setMessageListener(listener);
@@ -112,24 +115,33 @@ public class DMMessagesImpl implements DMMessages, ExceptionListener {
         private List<DMCallback> callbacks = new ArrayList<DMCallback>();
 
         private final DecisionMakerSender sender;
+        
+        private ExecutorService executorService;
 
         private final String topic;
 
         private Hierarchy hierarchy;
 
-        public Listener(String topic, DecisionMakerSender sender, Hierarchy hierarchy) {
+        public Listener(String topic, DecisionMakerSender sender, Hierarchy hierarchy, ExecutorService executorService) {
             super();
             this.topic = topic;
             this.sender = sender;
             this.hierarchy = hierarchy;
+            this.executorService = executorService; 
         }
 
         @Override
-        public void onMessage(Message message) {
-            if (message instanceof ObjectMessage) {
-                ObjectMessage objectMessage = (ObjectMessage) message;
-                callCallbacks(objectMessage);
-            }
+        public void onMessage(final Message message) {
+        	executorService.submit(new Runnable() {
+				
+				@Override
+				public void run() {
+					if (message instanceof ObjectMessage) {
+		                ObjectMessage objectMessage = (ObjectMessage) message;
+		                callCallbacks(objectMessage);
+		            }					
+				}
+			});
         }
 
         private void callCallbacks(ObjectMessage objectMessage) {
