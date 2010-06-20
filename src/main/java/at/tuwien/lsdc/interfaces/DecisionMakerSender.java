@@ -9,5 +9,10 @@ package at.tuwien.lsdc.interfaces;
  */
 public interface DecisionMakerSender {
 
+	/**
+	 * Resends the monitor message to another topic.
+	 * @param topic name of the destination topic
+	 * @param message monitor message to be resent
+	 */
     void resendMessage(String topic, MonitorMessage message);
 }

@@ -51,7 +51,6 @@ public class MonitorMessagesImpl implements MonitorSender, DecisionMakerSender {
 
     @Override
     public void resendMessage(String topic, MonitorMessage message) {
-//        A message
         this.send(topic, message);
     }
 

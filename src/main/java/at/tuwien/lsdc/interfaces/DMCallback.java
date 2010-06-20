@@ -10,6 +10,9 @@ package at.tuwien.lsdc.interfaces;
 public interface DMCallback {
 
     /**
+     * This message is called when callback receives a message from the monitor.
+     * @param topic name of the actual topic
+     * @param message message received from the monitor
      * @return true if problem can be resolved, false otherwise
      */
     boolean messageReceived(String topic, MonitorMessage message);

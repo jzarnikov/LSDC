@@ -1,12 +1,10 @@
 package at.tuwien.lsdc;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import at.tuwien.lsdc.interfaces.MonitorMessage;
@@ -15,7 +13,7 @@ public class MessageImpl implements MonitorMessage {
 
 	private static final long serialVersionUID = -6388600431644606873L;
 
-	private Map<Long, String> history = new HashMap<Long, String>();
+	private SortedMap<Long, String> history = new TreeMap<Long, String>();
 
     private final Serializable messageObject;
 
@@ -25,8 +23,8 @@ public class MessageImpl implements MonitorMessage {
     }
 
     @Override
-    public Map<Long, String> getHistory() {
-        return Collections.unmodifiableMap(history);
+    public SortedMap<Long, String> getHistory() {
+        return Collections.unmodifiableSortedMap(history);
     }
 
     @Override
