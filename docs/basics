@@ -43,8 +43,5 @@ The monitors publish their messages to the topics using ActiveMQ. The unique top
 * It is scalable 
 
 4) Decision makers:
-TODO: document this.
-
-
-
- 
+The Decision Makers are there to react to specific problems recognized via the Monitors. To extend the earlier example if the latency is monitored as too high the Decision Maker that listens to the specific topic "latency" can decide to start another server instance to take burden of the slow system.
+To decide which measures should be taken the Decision Maker uses a provided Knowledge Base.
